@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside id="sidebar">
+    <img id="company-logo" src="./assets/company-logo.svg" alt="Construction Company">
+    <ul id="nav-buttons">
+      <li><span class="material-icons-round">apartment</span><a href="index.html">Projects</a></li>
+      <li><span class="material-icons-round">people</span><a href="users.html">Users</a></li>
+    </ul>
+  </aside>
+  
+  <main id="content">
+    <!-- Projects Page -->
+    <div class="page" id="projects-page">
+      <header>
+        <h2>Projects</h2>
+        <div>
+          <button id="new-project-button"><span class="material-icons-round">add</span>New Project</button>
+        </div>
+      </header>
+      <div id="projects-list">
+        <div class="project-card" >
+          <!-- onclick="showProjectDetails()" -->
+          <div class="card-header">
+            <p style="background-color: #ca8134; padding: 10px; border-radius: 8px; aspect-ratio: 1;">P1</p>
+            <div>
+              <h5>Project One</h5>
+              <p>Project description here.</p>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="card-property">
+              <p style="color: #969696;">Status</p>
+              <p>In Progress</p>
+            </div>
+            <div class="card-property">
+              <p style="color: #969696;">Due Date</p>
+              <p>2024-12-31</p>
+            </div>
+          </div>
+        </div>
+        <!-- Add more project cards as needed -->
+      </div>
+    </div>
+
+    <!-- Project Details Page (Hidden by Default) -->
+    <div class="page" id="project-details" style="display: none;">
+      <header>
+        <div>
+          <h2>Project One</h2>
+          <p style="color: #969696">Project description here.</p>
+        </div>
+      </header>
+      <div class="main-page-content">
+        <div style="display: flex; flex-direction: column; row-gap: 30px;">
+          <div class="dashboard-card" style="padding: 30px 0;">
+            <div style="padding: 0 30px;">
+              <div>
+                <h5>Project Overview</h5>
+                <p>Details about the project go here.</p>
+              </div>
+              <div style="display: flex; column-gap: 30px; padding: 30px 0px; justify-content: space-between;">
+                <div>
+                  <p style="color: #969696;">Status</p>
+                  <p>In Progress</p>
+                </div>
+                <div>
+                  <p style="color: #969696;">Due Date</p>
+                  <p>2024-12-31</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Project Modal -->
+    <dialog id="new-project-modal">
+      <form>
+        <h2>New Project</h2>
+        <div class="input-list">
+          <div class="form-field-container">
+            <label><span class="material-icons-round">apartment</span>Name</label>
+            <input type="text" placeholder="What's the name of your project?">
+            <p style="color: gray; font-size: var(--font-sm); margin-top: 5px; font-style: italic;">TIP: Give it a short name</p>
+          </div>
+          <div class="form-field-container">
+            <label><span class="material-icons-round">subject</span>Description</label>
+            <textarea cols="30" rows="5" placeholder="Give your project a nice description! So people is jealous about it."></textarea>
+          </div>
+          <div class="form-field-container">
+            <label><span class="material-icons-round">person</span>Role</label>
+            <select>
+              <option>Architect</option>
+              <option>Engineer</option>
+              <option>Developer</option>
+            </select>
+          </div>
+          <div class="form-field-container">
+            <label><span class="material-icons-round">not_listed_location</span>Status</label>
+            <select>
+              <option>Pending</option>
+              <option>Active</option>
+              <option>Finished</option>
+            </select>
+          </div>
+          <div class="form-field-container">
+            <label for="finishDate">
+              <span class="material-icons-round">calendar_month</span>
+              Finish Date
+            </label>
+            <input type="date" name="finishDate"></input>
+          </div>
+          <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 10px;">
+            <button type="button" style="background-color: transparent;" id="cancel-button">Cancel</button>
+            <button type="submit" style="background-color: rgb(18, 145, 18);">Accept</button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+  </main>
+
+  <!-- <script>
+    // JavaScript to handle modal and page navigation
+    const newProjectButton = document.getElementById('new-project-button');
+    const newProjectModal = document.getElementById('new-project-modal');
+    const cancelButton = document.getElementById('cancel-button');
+    const projectDetailsPage = document.getElementById('project-details');
+    const projectsPage = document.getElementById('projects-page');
+
+    newProjectButton.onclick = () => {
+      newProjectModal.showModal();
+    };
+
+    cancelButton.onclick = () => {
+      newProjectModal.close();
+    };
+
+    function showProjectDetails() {
+      projectsPage.style.display = 'none';
+      projectDetailsPage.style.display = 'block';
+    }
+  </script> -->
+</body>
+</html>

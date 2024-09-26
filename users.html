@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Users</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside id="sidebar">
+    <img id="company-logo" src="./assets/company-logo.svg" alt="Construction Company">
+    <ul id="nav-buttons">
+      <li><span class="material-icons-round">apartment</span><a href="index.html">Projects</a></li>
+      <li><span class="material-icons-round">people</span><a href="users.html">Users</a></li>
+    </ul>
+  </aside>
+  <main id="content">
+    <div class="page" id="users-page">
+      <dialog id="new-user-modal">
+        <form>
+          <h2>New User</h2>
+          <div class="input-list">
+            <div class="form-field-container">
+              <label><span class="material-icons-round">person</span>Name</label>
+              <input type="text" placeholder="Enter user name">
+            </div>
+            <div class="form-field-container">
+              <label><span class="material-icons-round">email</span>Email</label>
+              <input type="email" placeholder="Enter user email">
+            </div>
+            <div class="form-field-container">
+              <label><span class="material-icons-round">badge</span>Role</label>
+              <select>
+                <option>Architect</option>
+                <option>Engineer</option>
+                <option>Developer</option>
+                <option>Manager</option>
+              </select>
+            </div>
+            <div class="form-field-container">
+              <label><span class="material-icons-round">supervisor_account</span>Status</label>
+              <select>
+                <option>Active</option>
+                <option>Inactive</option>
+              </select>
+            </div>
+            <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 10px;">
+              <button style="background-color: transparent;">Cancel</button>
+              <button style="background-color: rgb(18, 145, 18);">Accept</button>
+            </div>
+          </div>
+        </form>
+      </dialog>
+      <header>
+        <h2>Users</h2>
+        <div>
+          <button><span class="material-icons-round">add</span>New User</button>
+        </div>
+      </header>
+      <div id="users-list">
+        <div class="user-card">
+          <div class="card-header">
+            <p style="background-color: #ca8134; padding: 10px; border-radius: 8px; aspect-ratio: 1;">JD</p>
+            <div>
+              <h5>John Doe</h5>
+              <p>Architect</p>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="card-property">
+              <p style="color: #969696;">Email</p>
+              <p>john.doe@example.com</p>
+            </div>
+            <div class="card-property">
+              <p style="color: #969696;">Status</p>
+              <p>Active</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
