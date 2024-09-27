@@ -164,8 +164,8 @@ header {
 
 /* Project List */
 #projects-list {
-  display: flex;
-  flex-direction: grid;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 30px;
   padding: 20px 40px;
 }
