@@ -33,7 +33,9 @@ body {
   color: #fff;
 }
 
+
 /* General Styles */
+
 h2 {
   font-size: var(--font-3xl)
 }
@@ -74,8 +76,8 @@ button:hover {
   height: 100%;
 }
 
+/* Sidebar styles */
 
-/* Sidebar Styles */
 #sidebar {
   background-color: var(--background-100);
   padding: 25px;
@@ -85,7 +87,7 @@ button:hover {
 }
 
 #company-logo {
-  height: 65px;
+	height: 65px;
 }
 
 #nav-buttons {
@@ -109,14 +111,10 @@ button:hover {
   background-color: var(--primary);
 }
 
-#nav-buttons li a {
-  color: white;
-  text-decoration: none;
-}
+/* Content styles */
 
-/* Content Styles */
 #content {
-  
+
 }
 
 header {
@@ -126,14 +124,13 @@ header {
   justify-content: space-between;
 }
 
-/* Project & User Card Styles */
-.project-card, .user-card {
+.project-card {
   background-color: var(--background-100);
   border-radius: 8px;
   cursor: pointer;
 }
 
-.project-card:hover, .user-card:hover {
+.project-card:hover {
   outline: 2px solid var(--primary);
 }
 
@@ -162,68 +159,19 @@ header {
   width: 100%;
 }
 
-/* Project List */
 #projects-list {
   display: grid;
+  padding: 20px 40px;
+  gap: 30px;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 30px;
-  padding: 20px 40px;
 }
-
-/* User List */
-#users-list {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  padding: 20px 40px;
-}
-
-/* Project details page */
-
-.dashboard-card {
-  background-color: var(--background-100);
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-}
-
-#project-details > .main-page-content {
-  display: grid;
-  padding: 20px 40px;
-  gap: 30px;
-  grid-template-columns: 475px 1fr;
-  height: 100%;
-}
-
-.btn-secondary {
-  background-color: transparent; 
-  outline: 2px solid #969696; 
-  width: 100px; 
-  text-align: center;
-}
-
-.btn-secondary:hover {
-  background-color: var(--primary); 
-  outline: none;
-}
-
-.todo-item {
-  padding: 20px;
-  background-color: var(--background-200);
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.todo-item:hover {
-  background-color: var(--primary);
-}
-
 
 /* Form Styles */
+
 dialog {
   background-color: transparent; 
   border: none;
-  margin: auto;
+	margin: auto;
 }
 
 dialog::backdrop {
@@ -267,7 +215,7 @@ label {
 
 input, textarea, select {
   color: white; 
-  background-color: var(--background-200);
+	background-color: var(--background-200);
   padding: 15px; 
   border-radius: 8px; 
   border: none;
@@ -275,5 +223,45 @@ input, textarea, select {
 }
 
 input:focus, textarea:focus, select:focus {
-  outline: 2px solid var(--primary-300);
+  outline: 2px solid var(--primary);
+}
+
+/* Project details page */
+
+.dashboard-card {
+  background-color: var(--background-100);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+#project-details > .main-page-content {
+  display: grid;
+  padding: 20px 40px;
+  gap: 30px;
+  grid-template-columns: 475px 1fr;
+  height: 100%;
+}
+
+.btn-secondary {
+  background-color: transparent; 
+  outline: 2px solid #969696; 
+  width: 100px; 
+  text-align: center;
+}
+
+.btn-secondary:hover {
+  background-color: var(--primary); 
+  outline: none;
+}
+
+.todo-item {
+  padding: 20px;
+  background-color: var(--background-200);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.todo-item:hover {
+  background-color: var(--primary);
 }
