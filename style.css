@@ -22,6 +22,7 @@
   font-family: 'Inter', sans-serif;
   margin: 0;
   padding: 0;
+  font-size: var(--font-base);
 }
 
 body {
@@ -113,10 +114,6 @@ button:hover {
 
 /* Content styles */
 
-#content {
-
-}
-
 header {
   padding: 30px 40px;
   display: flex;
@@ -164,6 +161,19 @@ header {
   padding: 20px 40px;
   gap: 30px;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+}
+
+.action-icon {
+  color: darkgray;
+  border-radius: 100%;
+  padding: 4px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.action-icon:hover {
+  color: white;
+  background-color: var(--primary);
 }
 
 /* Form Styles */
