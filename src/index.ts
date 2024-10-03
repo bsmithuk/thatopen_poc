@@ -92,7 +92,6 @@ if (importProjectsBtn) {
 }
 
 
-
 // Initialize the PageNavigator
 document.addEventListener('DOMContentLoaded', () => {
   const navigator = new PageNavigator();
