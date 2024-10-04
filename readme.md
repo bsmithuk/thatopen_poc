@@ -1,0 +1,1 @@
+This is POC demo for a IFC Database Platform
