@@ -57,9 +57,9 @@ export class ProjectsManager {
       if (dataElements.length > 0) {
         if (key === "finishDate") {
           // Format the finish date
-          const formattedDate = project.finishDate.toLocaleDateString("en-US", {
+          const formattedDate = project.finishDate.toLocaleDateString("en-UK", {
             year: "numeric",
-            month: "long",
+            month: "numeric",
             day: "numeric",
           });
 
