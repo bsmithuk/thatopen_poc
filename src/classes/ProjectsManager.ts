@@ -23,6 +23,10 @@ export class ProjectsManager {
     if (nameInUse) {
       throw new Error(`A project with the name "${data.name}" already exists`);
     }
+    // Check for project name minimum length
+    if (data.name.length < 3) {
+      throw new Error("Project name must be at least 3 characters long");
+    }
     // Create new project
     const project = new Project(data);
     project.ui.addEventListener("click", () => {
@@ -55,7 +59,24 @@ export class ProjectsManager {
 
       // Only proceed if there are matching elements
       if (dataElements.length > 0) {
-        if (key === "finishDate") {
+        if (key === "progress") {
+          const progressValue = project.progress;  
+          // Update both text and width for each 'progress' element
+          dataElements.forEach((element) => {
+            const progressElement = element as HTMLElement; // Cast to HTMLElement
+              progressElement.textContent = `${progressValue}%`;
+              progressElement.style.width = `${progressValue}%`;
+            // Set a background color (e.g., green when progress is full)
+            if (progressValue === 100) {
+              progressElement.style.backgroundColor = 'green';
+            } else if (progressValue > 30) {
+              progressElement.style.backgroundColor = 'orange';
+            } else {
+              progressElement.style.backgroundColor = 'red';
+            }
+          });
+        } 
+        else if (key === "finishDate") {
           // Format the finish date
           const formattedDate = project.finishDate.toLocaleDateString("en-UK", {
             year: "numeric",
