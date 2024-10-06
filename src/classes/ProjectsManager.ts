@@ -1,11 +1,15 @@
-import { IProject, Project } from "./Project";
+import { IProject, Project, ProjectStatus, UserRole } from "./Project";
 
 export class ProjectsManager {
-  list: Project[] = [];
-  ui: HTMLElement;
+  private list: Project[] = [];
+  private ui: HTMLElement;
 
   constructor(container: HTMLElement) {
     this.ui = container;
+    this.initializeDefaultProject();
+  }
+
+  private initializeDefaultProject() {
     this.newProject({
       name: "Default Project",
       description: "This is just a default app project",
@@ -15,149 +19,167 @@ export class ProjectsManager {
     });
   }
 
-  newProject(data: IProject) {
-    // Check for duplicate project names
-    const projectNames = this.list.map((project) => project.name);
-    const nameInUse = projectNames.includes(data.name);
-
-    if (nameInUse) {
-      throw new Error(`A project with the name "${data.name}" already exists`);
-    }
-    // Check for project name minimum length
-    if (data.name.length < 3) {
-      throw new Error("Project name must be at least 3 characters long");
-    }
-    // Create new project
+  newProject(data: IProject): Project {
+    this.validateProjectData(data);
     const project = new Project(data);
-    project.ui.addEventListener("click", () => {
-      // Get the projects and details page elements
-      const projectsPage = document.getElementById("projects-page");
-      const detailsPage = document.getElementById("project-details");
-      if (!(projectsPage && detailsPage)) {
-        return;
-      }
-      projectsPage.style.display = "none";
-      detailsPage.style.display = "flex";
-      this.setDetailsPage(project);
-    });
-    // Add the project to the UI and the list
+    project.ui.addEventListener("click", () => this.handleProjectClick(project));
     this.ui.append(project.ui);
     this.list.push(project);
     return project;
   }
 
-  private setDetailsPage(project: Project) {
-    const detailPage = document.getElementById("project-details");
-    if (!detailPage) {
-      return;
+  private validateProjectData(data: IProject) {
+    if (this.list.some(project => project.name === data.name)) {
+      throw new Error(`A project with the name "${data.name}" already exists`);
     }
-    for (const key in project) {
-      // Select all elements matching the data attribute
-      const dataElements = detailPage.querySelectorAll(
-        `[data-project-info="${key}"]`
-      );
-
-      // Only proceed if there are matching elements
-      if (dataElements.length > 0) {
-        if (key === "progress") {
-          const progressValue = project.progress;  
-          // Update both text and width for each 'progress' element
-          dataElements.forEach((element) => {
-            const progressElement = element as HTMLElement; // Cast to HTMLElement
-              progressElement.textContent = `${progressValue}%`;
-              progressElement.style.width = `${progressValue}%`;
-            // Set a background color (e.g., green when progress is full)
-            if (progressValue === 100) {
-              progressElement.style.backgroundColor = 'green';
-            } else if (progressValue > 30) {
-              progressElement.style.backgroundColor = 'orange';
-            } else {
-              progressElement.style.backgroundColor = 'red';
-            }
-          });
-        } 
-        else if (key === "finishDate") {
-          // Format the finish date
-          const formattedDate = project.finishDate.toLocaleDateString("en-UK", {
-            year: "numeric",
-            month: "numeric",
-            day: "numeric",
-          });
-
-          // Update all elements for finishDate
-          dataElements.forEach((element) => {
-            element.textContent = formattedDate;
-          });
-        } else {
-          // Update text content for other properties
-          dataElements.forEach((element) => {
-            element.textContent = project[key]?.toString() || ""; // Convert to string or default to empty
-          });
-        }
-      }
+    if (data.name.length < 3) {
+      throw new Error("Project name must be at least 3 characters long");
     }
   }
 
-  getProject(id: string) {
-    const project = this.list.find((project) => {
-      return project.id === id;
-    });
-    return project;
+  private handleProjectClick(project: Project) {
+    const projectsPage = document.getElementById("projects-page");
+    const detailsPage = document.getElementById("project-details");
+    if (projectsPage && detailsPage) {
+      projectsPage.style.display = "none";
+      detailsPage.style.display = "flex";
+      this.setDetailsPage(project);
+    }
+  }
+
+  setDetailsPage(project: Project) {
+    const detailPage = document.getElementById("project-details");
+    if (!detailPage) return;
+
+    detailPage.setAttribute("data-current-project-id", project.id);
+
+    const updateElement = (selector: string, value: string) => {
+      const elements = detailPage.querySelectorAll(selector);
+      elements.forEach(element => {
+        if (element) element.textContent = value;
+      });
+    };
+
+    updateElement('[data-project-info="name"]', project.name);
+    updateElement('[data-project-info="description"]', project.description);
+    updateElement('[data-project-info="status"]', project.status);
+    updateElement('[data-project-info="userRole"]', project.userRole);
+    updateElement('[data-project-info="finishDate"]', project.finishDate.toLocaleDateString("en-UK"));
+    
+    const progressElement = detailPage.querySelector('[data-project-info="progress"]') as HTMLElement;
+    if (progressElement) {
+      const progressValue = project.progress;
+      progressElement.textContent = `${progressValue}%`;
+      progressElement.style.width = `${progressValue}%`;
+      progressElement.style.backgroundColor = this.getProgressColor(progressValue);
+    }
+
+    const codeElement = detailPage.querySelector('[data-project-info="code"]') as HTMLElement;
+    if (codeElement) {
+      codeElement.textContent = project.code;
+      codeElement.style.backgroundColor = project.getColour();
+    }
+  }
+
+  private getProgressColor(progress: number): string {
+    if (progress === 100) return 'green';
+    if (progress > 30) return 'orange';
+    return 'red';
+  }
+
+  getProject(id: string): Project | undefined {
+    return this.list.find(project => project.id === id);
+  }
+
+  updateProject(id: string, data: Partial<IProject>) {
+    const project = this.getProject(id);
+    if (!project) {
+      throw new Error(`Project with id "${id}" not found`);
+    }
+    Object.assign(project, data);
+    this.setDetailsPage(project);
+    this.updateProjectCard(project);
+  }
+
+  private updateProjectCard(project: Project) {
+    const projectCard = this.ui.querySelector(`[data-project-id="${project.id}"]`);
+    if (projectCard instanceof HTMLElement) {
+      const updateElement = (selector: string, value: string) => {
+        const element = projectCard.querySelector(selector);
+        if (element instanceof HTMLElement) element.textContent = value;
+      };
+
+      updateElement('[data-project-name]', project.name);
+      updateElement('[data-project-description]', project.description);
+      updateElement('[data-project-status]', project.status);
+      updateElement('[data-project-role]', project.userRole);
+    }
+  }
+
+  refreshProjectDetails(id: string) {
+    const project = this.getProject(id);
+    if (project) {
+      this.setDetailsPage(project);
+      this.updateProjectCard(project);
+    }
   }
 
   deleteProject(id: string) {
     const project = this.getProject(id);
-    if (!project) {
-      return;
+    if (project) {
+      project.ui.remove();
+      this.list = this.list.filter(p => p.id !== id);
     }
-    project.ui.remove();
-    const remaining = this.list.filter((project) => {
-      return project.id !== id;
-    });
-    this.list = remaining;
   }
 
   exportToJSON(fileName: string = "projects") {
-    function replacer(key, value) {
-      // Replacer function to filter out specific properties
-      if (key === "ui") {
-        return undefined;
-      }
-      return value;
-    }
-    const json = JSON.stringify(this.list, replacer, 2);
+    const data = this.list.map(project => ({
+      name: project.name,
+      description: project.description,
+      status: project.status,
+      userRole: project.userRole,
+      finishDate: project.finishDate,
+      progress: project.progress,
+      cost: project.cost
+    }));
+    const json = JSON.stringify(data, null, 2);
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); // Create a temporary anchor element to trigger the download
+    const a = document.createElement("a");
     a.href = url;
     a.download = `${fileName}.json`;
     a.click();
-    URL.revokeObjectURL(url); // Revoke the URL to free up memory
+    URL.revokeObjectURL(url);
   }
 
   importFromJSON() {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "application/json";
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      const json = reader.result;
-      if (!json) {
-        return;
+    input.addEventListener("change", (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const projects: IProject[] = JSON.parse(e.target?.result as string);
+            projects.forEach(project => {
+              try {
+                this.newProject({
+                  ...project,
+                  finishDate: new Date(project.finishDate)
+                });
+              } catch (error) {
+                console.error(`Failed to import project: ${project.name}`, error);
+              }
+            });
+          } catch (error) {
+            console.error("Failed to parse JSON", error);
+            alert("Failed to import projects. Invalid file format.");
+          }
+        };
+        reader.readAsText(file);
       }
-      const projects: IProject[] = JSON.parse(json as string);
-      for (const project of projects) {
-        try {
-          this.newProject(project);
-        } catch (error) {}
-      }
-    });
-    input.addEventListener("change", () => {
-      const filesList = input.files;
-      if (!filesList) {
-        return;
-      }
-      reader.readAsText(filesList[0]);
     });
     input.click();
   }

@@ -34,7 +34,6 @@ body {
   color: #fff;
 }
 
-
 /* General Styles */
 
 h2 {
@@ -88,7 +87,7 @@ button:hover {
 }
 
 #company-logo {
-	height: 65px;
+  height: 65px;
 }
 
 #nav-buttons {
@@ -181,7 +180,7 @@ header {
 dialog {
   background-color: transparent; 
   border: none;
-	margin: auto;
+  margin: auto;
 }
 
 dialog::backdrop {
@@ -225,7 +224,7 @@ label {
 
 input, textarea, select {
   color: white; 
-	background-color: var(--background-200);
+  background-color: var(--background-200);
   padding: 15px; 
   border-radius: 8px; 
   border: none;
@@ -234,6 +233,12 @@ input, textarea, select {
 
 input:focus, textarea:focus, select:focus {
   outline: 2px solid var(--primary);
+}
+
+.input-tip {
+  font-size: var(--font-xs);
+  color: rgba(150,150,150,1);
+  margin-top: 5px;
 }
 
 /* Project details page */

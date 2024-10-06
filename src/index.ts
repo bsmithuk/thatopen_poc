@@ -1,116 +1,134 @@
-import { IProject, ProjectStatus, UserRole } from "./classes/Project";
+import { IProject, Project, ProjectStatus, UserRole } from "./classes/Project";
 import { ProjectsManager } from "./classes/ProjectsManager";
 import { PageNavigator } from "./classes/PageNavigator";
-
-function showModal(id: string) {
-  const modal = document.getElementById(id);
-  if (modal && modal instanceof HTMLDialogElement) {
-    modal.showModal();
-  } else {
-    console.warn("The provided modal wasn't found. ID: ", id);
-  }
-}
-
-function closeModal(id: string) {
-  const modal = document.getElementById(id);
-  if (modal && modal instanceof HTMLDialogElement) {
-    modal.close();
-  } else {
-    console.warn("The provided modal wasn't found. ID: ", id);
-  }
-}
-
-function toggleModal() {
-  const modal = document.getElementById(
-    "new-project-modal"
-  ) as HTMLDialogElement;
-  if (modal) {
-    if (modal.open) {
-      modal.close();
-    } else {
-      modal.showModal();
-    }
-  }
-}
 
 const projectsListUI = document.getElementById("projects-list") as HTMLElement;
 const projectsManager = new ProjectsManager(projectsListUI);
 
-// This document object is provided by the browser, and its main purpose is to help us interact with the DOM.
+// New Project Button
 const newProjectBtn = document.getElementById("new-project-btn");
-if (newProjectBtn) {
-  newProjectBtn.addEventListener("click", () => {
-    showModal("new-project-modal");
-  });
-} else {
-  console.warn("New projects button was not found");
-}
+const newProjectModal = document.getElementById("new-project-modal") as HTMLDialogElement;
+const projectForm = document.getElementById("new-project-form") as HTMLFormElement;
 
-const projectForm = document.getElementById("new-project-form");
-if (projectForm && projectForm instanceof HTMLFormElement) {
+if (newProjectBtn && newProjectModal && projectForm) {
+  newProjectBtn.addEventListener("click", () => newProjectModal.showModal());
+
   projectForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const formData = new FormData(projectForm);
+    const finishDateStr = formData.get("finishDate") as string;
+    const finishDate = finishDateStr ? new Date(finishDateStr) : getDefaultFinishDate();
+    
     const projectData: IProject = {
+      name: formData.get("name") as string,
+      description: formData.get("description") as string,
+      status: formData.get("status") as ProjectStatus,
+      userRole: formData.get("userRole") as UserRole,
+      finishDate: finishDate,
+    };
+
+    try {
+      projectsManager.newProject(projectData);
+      projectForm.reset();
+      newProjectModal.close();
+    } catch (err) {
+      console.error("Failed to create new project:", err);
+      alert(err);
+    }
+  });
+} else {
+  console.warn("New project elements not found. Check your HTML.");
+}
+
+// Edit Project
+const editProjectBtn = document.getElementById("edit-project-btn");
+const editProjectModal = document.getElementById("edit-project-modal") as HTMLDialogElement;
+const editProjectForm = document.getElementById("edit-project-form") as HTMLFormElement;
+const cancelEditBtn = document.getElementById("cancel-edit-btn");
+
+if (editProjectBtn && editProjectModal && editProjectForm && cancelEditBtn) {
+  editProjectBtn.addEventListener("click", () => {
+    const currentProject = getCurrentProject();
+    if (currentProject) {
+      (editProjectForm.elements.namedItem("name") as HTMLInputElement).value = currentProject.name;
+      (editProjectForm.elements.namedItem("description") as HTMLTextAreaElement).value = currentProject.description;
+      (editProjectForm.elements.namedItem("userRole") as HTMLSelectElement).value = currentProject.userRole;
+      (editProjectForm.elements.namedItem("status") as HTMLSelectElement).value = currentProject.status;
+      (editProjectForm.elements.namedItem("finishDate") as HTMLInputElement).value = currentProject.finishDate.toISOString().split('T')[0];
+      editProjectModal.showModal();
+    } else {
+      console.error("No current project found");
+      alert("No project selected for editing.");
+    }
+  });
+
+  cancelEditBtn.addEventListener("click", () => editProjectModal.close());
+
+  editProjectForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const formData = new FormData(editProjectForm);
+    const projectData: Partial<IProject> = {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
       status: formData.get("status") as ProjectStatus,
       userRole: formData.get("userRole") as UserRole,
       finishDate: new Date(formData.get("finishDate") as string),
     };
-    try {
-      const project = projectsManager.newProject(projectData);
-      projectForm.reset();
-      closeModal("new-project-modal");
-    } catch (err) {
-      alert(err);
+    const currentProject = getCurrentProject();
+    if (currentProject) {
+      try {
+        projectsManager.updateProject(currentProject.id, projectData);
+        editProjectModal.close();
+        // Refresh the project details view
+        projectsManager.refreshProjectDetails(currentProject.id);
+      } catch (error) {
+        console.error("Failed to update project:", error);
+        alert("Failed to update project. Please try again.");
+      }
+    } else {
+      console.error("No current project found");
+      alert("No project selected for editing.");
     }
   });
-} else {
-  console.warn("The project form was not found. Check the ID!");
 }
 
-// Close modal when cancel button is clicked
-document
-  .querySelector("button[type='button']")
-  ?.addEventListener("click", () => {
-    toggleModal();
-  });
-
+// Export/Import 
 const exportProjectsBtn = document.getElementById("export-projects-btn");
 if (exportProjectsBtn) {
-  exportProjectsBtn.addEventListener("click", () => {
-    projectsManager.exportToJSON();
-  });
+  exportProjectsBtn.addEventListener("click", () => projectsManager.exportToJSON());
 }
 
 const importProjectsBtn = document.getElementById("import-projects-btn")
 if (importProjectsBtn) {
-  importProjectsBtn.addEventListener("click", () => {
-    projectsManager.importFromJSON()
-  })
+  importProjectsBtn.addEventListener("click", () => projectsManager.importFromJSON());
 }
 
-
-// Initialize the PageNavigator
+// PageNavigator 
 document.addEventListener('DOMContentLoaded', () => {
   const navigator = new PageNavigator();
-
-  // Event for projects navigation button
   const projectsNavBtn = document.getElementById("projects-nav-btn");
-  if (projectsNavBtn) {
-    projectsNavBtn.addEventListener("click", () => {
-      navigator.navigateTo("projects-page");
-    });
-  }
-
-  // Event for users navigation button
   const usersNavBtn = document.getElementById("users-nav-btn");
+
+  if (projectsNavBtn) {
+    projectsNavBtn.addEventListener("click", () => navigator.navigateTo("projects-page"));
+  }
   if (usersNavBtn) {
-    usersNavBtn.addEventListener("click", () => {
-      navigator.navigateTo("users-page");
-    });
+    usersNavBtn.addEventListener("click", () => navigator.navigateTo("users-page"));
   }
 });
 
+// Helper Functions
+function getDefaultFinishDate(): Date {
+  const date = new Date();
+  date.setMonth(date.getMonth() + 1);
+  return date;
+}
 
+function getCurrentProject(): Project | null {
+  const projectDetailsPage = document.getElementById("project-details");
+  if (projectDetailsPage) {
+    const projectId = projectDetailsPage.getAttribute("data-current-project-id");
+    return projectId ? projectsManager.getProject(projectId) || null : null;
+  }
+  return null;
+}

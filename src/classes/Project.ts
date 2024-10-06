@@ -1,13 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-function getRandomColour() {
-  const letters = "0123456789ABCDEF";
-  let color = "#";
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-}
+
 
 export type ProjectStatus = "pending" | "active" | "finished";
 export type UserRole = "architect" | "engineer" | "developer";
@@ -33,7 +26,6 @@ export class Project implements IProject {
   cost: number = 0;
   progress: number = 0;
   id: string;
-
   // Colour property to store the generated color
   private colour: string;
 
@@ -51,7 +43,17 @@ export class Project implements IProject {
         : new Date(data.finishDate);
     this.cost = 0;
     this.progress = 0;
+    this.colour = this.getRandomColour();    
     this.setUI();
+  }
+
+  private getRandomColour(): string {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
   }
 
   //Pull UI into 'Project'
@@ -63,9 +65,7 @@ export class Project implements IProject {
     this.ui.className = "project-card";
     this.ui.innerHTML = `
     <div class="card-header">
-      <p style="background-color: ${getRandomColour()}; padding: 10px; border-radius: 8px; aspect-ratio: 1;">${
-      this.code
-    }</p>
+      <p style="background-color: ${this.colour}; padding: 10px; border-radius: 14px; aspect-ratio: 1;">${this.code}</p>
       <div>
         <h5>${this.name}</h5>
         <p>${this.description}</p>

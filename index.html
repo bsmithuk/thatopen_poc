@@ -54,7 +54,7 @@
               <input name="finishDate" type="date"></input>
             </div>
             <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 10px;">
-              <button type="button" style="background-color: transparent;">Cancel</button>
+              <button type="button" id="cancel-project-btn" style="background-color: transparent;">Cancel</button>
               <button type="submit" style="background-color: rgb(18, 145, 18);">Accept</button>
             </div>
           </div>
@@ -71,6 +71,65 @@
       <div id="projects-list"></div>
     </div>
     <div class="page" id="project-details" style="display: none">
+      <dialog id="edit-project-modal">
+        <form id="edit-project-form">
+          <h2>Edit Project</h2>
+          <div class="input-list">
+            <div class="form-field-container">
+              <label for="edit-name">
+                <span class="material-icons-round">apartment</span>
+                Name
+              </label>
+              <input type="text" id="edit-name" name="name" required>
+            </div>
+      
+            <div class="form-field-container">
+              <label for="edit-description">
+                <span class="material-icons-round">subject</span>
+                Description
+              </label>
+              <textarea id="edit-description" name="description" required></textarea>
+            </div>
+      
+            <div class="form-field-container">
+              <label for="edit-userRole">
+                <span class="material-icons-round">person</span>
+                Role
+              </label>
+              <select id="edit-userRole" name="userRole" required>
+                <option value="architect">Architect</option>
+                <option value="engineer">Engineer</option>
+                <option value="developer">Developer</option>
+              </select>
+            </div>
+      
+            <div class="form-field-container">
+              <label for="edit-status">
+                <span class="material-icons-round">not_listed_location</span>
+                Status
+              </label>
+              <select id="edit-status" name="status" required>
+                <option value="pending">Pending</option>
+                <option value="active">Active</option>
+                <option value="finished">Finished</option>
+              </select>
+            </div>
+      
+            <div class="form-field-container">
+              <label for="edit-finishDate">
+                <span class="material-icons-round">calendar_month</span>
+                Finish Date
+              </label>
+              <input type="date" id="edit-finishDate" name="finishDate" required>
+            </div>
+      
+            <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 10px;">
+              <button type="button" id="cancel-edit-btn" class="btn-secondary" style="background-color: transparent;">Cancel</button>
+              <button type="submit" style="background-color: rgb(18, 145, 18);">Accept</button>
+            </div>
+          </div>
+        </form>
+      </dialog>
       <header>
         <div>
           <h2 data-project-info="name">Hospital Center</h2>
@@ -81,8 +140,8 @@
         <div style="display: flex; flex-direction: column; row-gap: 30px;">
           <div class="dashboard-card" style="padding: 30px 0;">
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0px 30px; margin-bottom: 30px;">
-              <p data-project-info="code" style="font-size: 20px; background-color: #ca8134; aspect-ratio: 1; border-radius: 100%; padding: 12px;">HC</p>
-              <button class="btn-secondary"><p style="width: 100%;">Edit</p></button>
+              <p data-project-info="code" style="font-size: 20px; background-color: #ca8134; aspect-ratio: 1; border-radius: 14px; padding: 12px;">HC</p>
+              <button class="btn-secondary" id="edit-project-btn"><p style="width: 100%;">Edit</p></button>
             </div>
             <div style="padding: 0 30px;">
               <div>
