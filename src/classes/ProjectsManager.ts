@@ -101,6 +101,22 @@ export class ProjectsManager {
     this.updateProjectCard(project);
   }
 
+  refreshProjectDetails(id: string) {
+    const project = this.getProject(id);
+    if (project) {
+      this.setDetailsPage(project);
+      this.refreshProjectsList(); // Added line
+    }
+  }
+  
+  refreshProjectsList() {
+    this.ui.innerHTML = ''; // Clear the current list
+    this.list.forEach(project => {
+      project.setUI(); // Refresh the UI for each project
+      this.ui.appendChild(project.ui);
+    });
+  }
+
   private updateProjectCard(project: Project) {
     const projectCard = this.ui.querySelector(`[data-project-id="${project.id}"]`);
     if (projectCard instanceof HTMLElement) {
@@ -113,14 +129,6 @@ export class ProjectsManager {
       updateElement('[data-project-description]', project.description);
       updateElement('[data-project-status]', project.status);
       updateElement('[data-project-role]', project.userRole);
-    }
-  }
-
-  refreshProjectDetails(id: string) {
-    const project = this.getProject(id);
-    if (project) {
-      this.setDetailsPage(project);
-      this.updateProjectCard(project);
     }
   }
 

@@ -36,6 +36,10 @@ if (newProjectBtn && newProjectModal && projectForm) {
       alert(err);
     }
   });
+  const closeNewProjectBtn = document.getElementById("cancel-project-btn");
+  if (closeNewProjectBtn) {
+    closeNewProjectBtn.addEventListener("click", () => newProjectModal.close());
+  }
 } else {
   console.warn("New project elements not found. Check your HTML.");
 }
@@ -79,11 +83,21 @@ if (editProjectBtn && editProjectModal && editProjectForm && cancelEditBtn) {
       try {
         projectsManager.updateProject(currentProject.id, projectData);
         editProjectModal.close();
-        // Refresh the project details view
+        
+        // Refresh both the project details and the projects list
         projectsManager.refreshProjectDetails(currentProject.id);
+        projectsManager.refreshProjectsList();
+
+        // Navigate back to the projects page
+        const projectsPage = document.getElementById("projects-page");
+        const projectDetailsPage = document.getElementById("project-details");
+        if (projectsPage && projectDetailsPage) {
+          projectsPage.style.display = "flex";
+          projectDetailsPage.style.display = "none";
+        }
       } catch (error) {
         console.error("Failed to update project:", error);
-        alert("Failed to update project. Please try again.");
+        alert(error instanceof Error ? error.message : "Failed to update project. Please try again.");
       }
     } else {
       console.error("No current project found");
@@ -110,7 +124,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const usersNavBtn = document.getElementById("users-nav-btn");
 
   if (projectsNavBtn) {
-    projectsNavBtn.addEventListener("click", () => navigator.navigateTo("projects-page"));
+    projectsNavBtn.addEventListener("click", () => {
+      navigator.navigateTo("projects-page");
+      projectsManager.refreshProjectsList();
+    });
   }
   if (usersNavBtn) {
     usersNavBtn.addEventListener("click", () => navigator.navigateTo("users-page"));
