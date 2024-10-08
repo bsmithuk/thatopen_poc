@@ -92,8 +92,8 @@ if (editProjectBtn && editProjectModal && editProjectForm && cancelEditBtn) {
         const projectsPage = document.getElementById("projects-page");
         const projectDetailsPage = document.getElementById("project-details");
         if (projectsPage && projectDetailsPage) {
-          projectsPage.style.display = "flex";
-          projectDetailsPage.style.display = "none";
+          projectsPage.style.display = "none";
+          projectDetailsPage.style.display = "flex";
         }
       } catch (error) {
         console.error("Failed to update project:", error);
