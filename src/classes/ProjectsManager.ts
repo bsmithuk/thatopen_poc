@@ -97,15 +97,16 @@ export class ProjectsManager {
       throw new Error(`Project with id "${id}" not found`);
     }
     Object.assign(project, data);
+    project.setUI(); // Update the project's UI
     this.setDetailsPage(project);
-    this.updateProjectCard(project);
+    this.refreshProjectsList(); // Refresh the entire projects list
   }
 
   refreshProjectDetails(id: string) {
     const project = this.getProject(id);
     if (project) {
       this.setDetailsPage(project);
-      this.refreshProjectsList(); // Added line
+      this.refreshProjectsList(); // Refresh the projects list
     }
   }
   

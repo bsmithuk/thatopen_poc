@@ -56,27 +56,27 @@ export class Project implements IProject {
 
   //Pull UI into 'Project'
   setUI() {
-    if (this.ui) {
-      return;
+    if (!this.ui) {
+      this.ui = document.createElement("div");
     }
-    this.ui = document.createElement("div");
     this.ui.className = "project-card";
+    this.ui.setAttribute("data-project-id", this.id);
     this.ui.innerHTML = `
     <div class="card-header">
       <p style="background-color: ${this.colour}; padding: 10px; border-radius: 14px; aspect-ratio: 1;">${this.code}</p>
       <div>
-        <h5>${this.name}</h5>
-        <p>${this.description}</p>
+        <h5 data-project-name>${this.name}</h5>
+        <p data-project-description>${this.description}</p>
       </div>
     </div>
     <div class="card-content">
       <div class="card-property">
         <p style="color: #969696;">Status</p>
-        <p>${this.status}</p>
+        <p data-project-status>${this.status}</p>
       </div>
       <div class="card-property">
         <p style="color: #969696;">Role</p>
-        <p>${this.userRole}</p>
+        <p data-project-role>${this.userRole}</p>
       </div>
       <div class="card-property">
         <p style="color: #969696;">Cost</p>
