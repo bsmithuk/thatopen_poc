@@ -97,8 +97,25 @@ export class ProjectsManager {
       throw new Error(`Project with id "${id}" not found`);
     }
     Object.assign(project, data);
+    project.setUI(); // Update the project's UI
     this.setDetailsPage(project);
-    this.updateProjectCard(project);
+    this.refreshProjectsList(); // Refresh the entire projects list
+  }
+
+  refreshProjectDetails(id: string) {
+    const project = this.getProject(id);
+    if (project) {
+      this.setDetailsPage(project);
+      this.refreshProjectsList(); // Refresh the projects list
+    }
+  }
+  
+  refreshProjectsList() {
+    this.ui.innerHTML = ''; // Clear the current list
+    this.list.forEach(project => {
+      project.setUI(); // Refresh the UI for each project
+      this.ui.appendChild(project.ui);
+    });
   }
 
   private updateProjectCard(project: Project) {
@@ -113,14 +130,6 @@ export class ProjectsManager {
       updateElement('[data-project-description]', project.description);
       updateElement('[data-project-status]', project.status);
       updateElement('[data-project-role]', project.userRole);
-    }
-  }
-
-  refreshProjectDetails(id: string) {
-    const project = this.getProject(id);
-    if (project) {
-      this.setDetailsPage(project);
-      this.updateProjectCard(project);
     }
   }
 
