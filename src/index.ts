@@ -1,6 +1,7 @@
 import { IProject, Project, ProjectStatus, UserRole } from "./classes/Project";
 import { ProjectsManager } from "./classes/ProjectsManager";
 import { PageNavigator } from "./classes/PageNavigator";
+import { Todo } from "./classes/ToDo";
 
 const projectsListUI = document.getElementById("projects-list") as HTMLElement;
 const projectsManager = new ProjectsManager(projectsListUI);
@@ -103,6 +104,74 @@ if (editProjectBtn && editProjectModal && editProjectForm && cancelEditBtn) {
       console.error("No current project found");
       alert("No project selected for editing.");
     }
+  });
+}
+
+// Add Todo functionality
+const addTodoBtn = document.getElementById("add-todo-btn");
+const addTodoModal = document.getElementById("add-todo-modal") as HTMLDialogElement;
+const addTodoForm = document.getElementById("add-todo-form") as HTMLFormElement;
+
+if (addTodoBtn && addTodoModal && addTodoForm) {
+  addTodoBtn.addEventListener("click", () => addTodoModal.showModal());
+
+  addTodoForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const formData = new FormData(addTodoForm);
+    const description = formData.get("description") as string;
+    const dueDate = new Date(formData.get("dueDate") as string);
+    
+    const currentProjectId = document.getElementById("project-details")?.getAttribute("data-current-project-id");
+    
+    if (currentProjectId) {
+      try {
+        projectsManager.addTodo(currentProjectId, description, dueDate);
+        addTodoForm.reset();
+        addTodoModal.close();
+        
+        // Refresh the project details to show the new todo
+        projectsManager.refreshProjectDetails(currentProjectId);
+      } catch (err) {
+        console.error("Failed to add Todo:", err);
+        alert(err);
+      }
+    } else {
+      alert("No project selected");
+    }
+  });
+}
+
+
+// Add event listener for toggling todos
+document.addEventListener('click', (e) => {
+  const target = e.target as HTMLElement;
+  if (target.closest('.todo-item')) {
+    const todoItem = target.closest('.todo-item') as HTMLElement;
+    const todoIndex = Array.from(todoItem.parentElement?.children || []).indexOf(todoItem);
+    const projectId = document.getElementById("project-details")?.getAttribute("data-current-project-id");
+    if (projectId) {
+      const project = projectsManager.getProject(projectId);
+      if (project && project.todos[todoIndex]) {
+        projectsManager.toggleTodo(projectId, project.todos[todoIndex].id);
+      }
+    }
+  }
+});
+
+// Add search functionality
+const todoSearch = document.getElementById('todo-search') as HTMLInputElement;
+if (todoSearch) {
+  todoSearch.addEventListener('input', (e) => {
+    const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
+    const todoItems = document.querySelectorAll('.todo-item');
+    todoItems.forEach((item) => {
+      const text = item.textContent?.toLowerCase() || '';
+      if (text.includes(searchTerm)) {
+        (item as HTMLElement).style.display = '';
+      } else {
+        (item as HTMLElement).style.display = 'none';
+      }
+    });
   });
 }
 

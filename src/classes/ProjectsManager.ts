@@ -1,4 +1,5 @@
 import { IProject, Project, ProjectStatus, UserRole } from "./Project";
+import { Todo } from "./ToDo";
 
 export class ProjectsManager {
   private list: Project[] = [];
@@ -79,6 +80,27 @@ export class ProjectsManager {
       codeElement.textContent = project.code;
       codeElement.style.backgroundColor = project.getColour();
     }
+
+    this.updateTodoList(project, detailPage);
+  }
+
+  private updateTodoList(project: Project, detailPage: HTMLElement) {
+    const todoListElement = detailPage.querySelector('#todo-list');
+    if (todoListElement) {
+      todoListElement.innerHTML = project.todos.map(todo => `
+        <div class="todo-item">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; column-gap: 15px; align-items: center;">
+              <span class="material-icons-round" style="padding: 10px; background-color: #686868; border-radius: 10px;">
+                ${todo.completed ? 'check_circle' : 'radio_button_unchecked'}
+              </span>
+              <p>${todo.description}</p>
+            </div>
+            <p style="text-wrap: nowrap; margin-left: 10px;">${todo.dueDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+          </div>
+        </div>
+      `).join('');
+    }
   }
 
   private getProgressColor(progress: number): string {
@@ -110,6 +132,7 @@ export class ProjectsManager {
     }
   }
   
+
   refreshProjectsList() {
     this.ui.innerHTML = ''; // Clear the current list
     this.list.forEach(project => {
@@ -117,6 +140,7 @@ export class ProjectsManager {
       this.ui.appendChild(project.ui);
     });
   }
+
 
   private updateProjectCard(project: Project) {
     const projectCard = this.ui.querySelector(`[data-project-id="${project.id}"]`);
@@ -141,6 +165,44 @@ export class ProjectsManager {
     }
   }
 
+  //ToDo list functionality
+  addTodo(projectId: string, description: string, dueDate: Date) {
+    const project = this.getProject(projectId);
+    if (project) {
+      const newTodo = project.addTodo(description, dueDate);
+      this.refreshProjectDetails(projectId); // This line refreshes the project details, including the todo list
+      return newTodo;
+    } else {
+      throw new Error("Project not found");
+    }
+  }
+  removeTodo(projectId: string, todoId: string) {
+    const project = this.getProject(projectId);
+    if (project) {
+      project.removeTodo(todoId);
+      this.refreshProjectDetails(projectId);
+    }
+  }
+
+  updateTodo(projectId: string, todoId: string, description: string, dueDate: Date) {
+    const project = this.getProject(projectId);
+    if (project) {
+      project.updateTodo(todoId, description, dueDate);
+      this.refreshProjectDetails(projectId);
+    }
+  }
+
+  toggleTodo(projectId: string, todoId: string) {
+    const project = this.getProject(projectId);
+    if (project) {
+      project.toggleTodo(todoId);
+      this.refreshProjectDetails(projectId);
+    } else {
+      throw new Error("Project not found");
+    }
+  }
+
+  //Import/Export JSON
   exportToJSON(fileName: string = "projects") {
     const data = this.list.map(project => ({
       name: project.name,
