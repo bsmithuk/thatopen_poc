@@ -10,7 +10,10 @@ export interface IProject {
   status: ProjectStatus;
   userRole: UserRole;
   finishDate: Date;
+  progress?: number;  // Added as optional
+  cost?: number;      // Added as optional
 }
+
 
 export class Project implements IProject {
   //To satisfy IProject

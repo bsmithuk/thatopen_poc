@@ -188,19 +188,24 @@
           </div>
           <!-- ToDo Modal -->
           <dialog id="add-todo-modal">
-            <form id="add-todo-form" class="form-container">
-              <h3>Add New Todo</h3>
-              <div style="margin-bottom: 15px;">
-                <label for="todo-description">Description:</label>
-                <input type="text" id="todo-description" name="description" required style="width: 100%;">
-              </div>
-              <div style="margin-bottom: 15px;">
-                <label for="todo-due-date">Due Date:</label>
-                <input type="date" id="todo-due-date" name="dueDate" required style="width: 100%;">
-              </div>
-              <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                <button type="button" onclick="this.closest('dialog').close()">Cancel</button>
-                <button type="submit">Add Todo</button>
+            <form id="add-todo-form">
+              <h2>Add New Todo</h2>
+              
+              <div class="input-list">
+                <div class="form-field-container">
+                  <label>Description:</label>
+                  <textarea name="description" required></textarea>
+                </div>
+          
+                <div class="form-field-container">
+                  <label>Due Date:</label>
+                  <input type="date" name="dueDate" required>
+                </div>
+          
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                  <button type="button" class="btn-secondary" onclick="this.closest('dialog').close()">Cancel</button>
+                  <button type="submit">Add Todo</button>
+                </div>
               </div>
             </form>
           </dialog>

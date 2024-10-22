@@ -1,5 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 
+export enum TodoStatus {
+  TODO = "todo",
+  IN_PROGRESS = "in_progress",
+  BLOCKED = "blocked",
+  COMPLETED = "completed"
+}
+
 export class Todo {
   id: string;
   description: string;

@@ -314,6 +314,10 @@ input:focus, textarea:focus, select:focus {
   background-color: var(--background-200);
   border-radius: 10px;
   cursor: pointer;
+  word-break: break-word; 
+  overflow-wrap: break-word; 
+  white-space: normal; 
+  max-width: 100%; 
 }
 
 .todo-item:hover {
