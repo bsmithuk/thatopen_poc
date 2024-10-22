@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { Todo } from "./ToDo";
 
 export type ProjectStatus = "pending" | "active" | "finished";
 export type UserRole = "architect" | "engineer" | "developer";
@@ -9,7 +10,10 @@ export interface IProject {
   status: ProjectStatus;
   userRole: UserRole;
   finishDate: Date;
+  progress?: number;  // Added as optional
+  cost?: number;      // Added as optional
 }
+
 
 export class Project implements IProject {
   //To satisfy IProject
@@ -24,8 +28,8 @@ export class Project implements IProject {
   cost: number = 0;
   progress: number = 0;
   id: string;
-  // Colour property to store the generated color
-  private colour: string;
+  todos: Todo[] = [];
+  private colour: string;   // Colour property to store the generated color
 
   constructor(data: IProject) {
     // Project data definition
@@ -43,6 +47,30 @@ export class Project implements IProject {
     this.progress = 0;
     this.colour = this.getRandomColour();    
     this.setUI();
+  }
+
+  addTodo(description: string, dueDate: Date): Todo {
+    const newTodo = new Todo(description, dueDate);
+    this.todos.push(newTodo);
+    return newTodo;
+  }
+
+  removeTodo(id: string) {
+    this.todos = this.todos.filter(todo => todo.id !== id);
+  }
+
+  updateTodo(id: string, description: string, dueDate: Date) {
+    const todo = this.todos.find(t => t.id === id);
+    if (todo) {
+      todo.update(description, dueDate);
+    }
+  }
+
+  toggleTodo(id: string) {
+    const todo = this.todos.find(t => t.id === id);
+    if (todo) {
+      todo.toggle();
+    }
   }
 
   private getRandomColour(): string {
@@ -87,6 +115,25 @@ export class Project implements IProject {
         <p>${this.progress * 100}%</p>
       </div>
     </div>`;
+  }
+
+  updateTodoList() {
+    const todoList = this.ui.querySelector('#todo-list');
+    if (todoList) {
+      todoList.innerHTML = this.todos.map(todo => `
+        <div class="todo-item">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; column-gap: 15px; align-items: center;">
+              <span class="material-icons-round" style="padding: 10px; background-color: #686868; border-radius: 10px;">
+                ${todo.completed ? 'check_circle' : 'radio_button_unchecked'}
+              </span>
+              <p>${todo.description}</p>
+            </div>
+            <p style="text-wrap: nowrap; margin-left: 10px;">${todo.dueDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+          </div>
+        </div>
+      `).join('');
+    }
   }
 
   public getColour(): string {

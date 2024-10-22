@@ -177,23 +177,38 @@
               <div style="display: flex; align-items: center; justify-content: end; column-gap: 20px;">
                 <div style="display: flex; align-items: center; column-gap: 10px;">
                   <span class="material-icons-round">search</span>
-                  <input type="text" placeholder="Search To-Do's by name" style="width: 100%;">
+                  <input type="text" id="todo-search" placeholder="Search To-Do's by name" style="width: 100%;">
                 </div>
-                <span class="material-icons-round">add</span>
+                <span id="add-todo-btn" class="material-icons-round" style="cursor: pointer;">add</span>
               </div>
             </div>
-            <div style="display: flex; flex-direction: column; padding: 10px 30px; row-gap: 20px;">
-              <div class="todo-item">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <div style="display: flex; column-gap: 15px; align-items: center;">
-                    <span class="material-icons-round" style="padding: 10px; background-color: #686868; border-radius: 10px;">construction</span>
-                    <p>Make anything here as you want, even something longer.</p>
-                  </div>
-                  <p style="text-wrap: nowrap; margin-left: 10px;">Fri, 20 sep</p>
-                </div>
-              </div>
+            <div id="todo-list" style="display: flex; flex-direction: column; padding: 10px 30px; row-gap: 20px;">
+              <!-- Todo items will be dynamically inserted here -->
             </div>
           </div>
+          <!-- ToDo Modal -->
+          <dialog id="add-todo-modal">
+            <form id="add-todo-form">
+              <h2>Add New Todo</h2>
+              
+              <div class="input-list">
+                <div class="form-field-container">
+                  <label>Description:</label>
+                  <textarea name="description" required></textarea>
+                </div>
+          
+                <div class="form-field-container">
+                  <label>Due Date:</label>
+                  <input type="date" name="dueDate" required>
+                </div>
+          
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                  <button type="button" class="btn-secondary" onclick="this.closest('dialog').close()">Cancel</button>
+                  <button type="submit">Add Todo</button>
+                </div>
+              </div>
+            </form>
+          </dialog>
         </div>
         <div id="viewer-container" class="dashboard-card"></div>
       </div>

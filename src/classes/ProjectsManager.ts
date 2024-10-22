@@ -1,4 +1,15 @@
 import { IProject, Project, ProjectStatus, UserRole } from "./Project";
+import { Todo } from "./ToDo";
+
+interface ImportedProject extends IProject {
+  todos?: {
+    description: string;
+    dueDate: string;
+    completed: boolean;
+  }[];
+  progress: number;  
+  cost: number;
+}
 
 export class ProjectsManager {
   private list: Project[] = [];
@@ -79,6 +90,27 @@ export class ProjectsManager {
       codeElement.textContent = project.code;
       codeElement.style.backgroundColor = project.getColour();
     }
+
+    this.updateTodoList(project, detailPage);
+  }
+
+  private updateTodoList(project: Project, detailPage: HTMLElement) {
+    const todoListElement = detailPage.querySelector('#todo-list');
+    if (todoListElement) {
+      todoListElement.innerHTML = project.todos.map(todo => `
+        <div class="todo-item">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; column-gap: 15px; align-items: center;">
+              <span class="material-icons-round" style="padding: 10px; background-color: #686868; border-radius: 10px;">
+                ${todo.completed ? 'check_circle' : 'radio_button_unchecked'}
+              </span>
+              <p>${todo.description}</p>
+            </div>
+            <p style="text-wrap: nowrap; margin-left: 10px;">${todo.dueDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+          </div>
+        </div>
+      `).join('');
+    }
   }
 
   private getProgressColor(progress: number): string {
@@ -110,6 +142,7 @@ export class ProjectsManager {
     }
   }
   
+
   refreshProjectsList() {
     this.ui.innerHTML = ''; // Clear the current list
     this.list.forEach(project => {
@@ -117,6 +150,7 @@ export class ProjectsManager {
       this.ui.appendChild(project.ui);
     });
   }
+
 
   private updateProjectCard(project: Project) {
     const projectCard = this.ui.querySelector(`[data-project-id="${project.id}"]`);
@@ -141,6 +175,44 @@ export class ProjectsManager {
     }
   }
 
+  //ToDo list functionality
+  addTodo(projectId: string, description: string, dueDate: Date) {
+    const project = this.getProject(projectId);
+    if (project) {
+      const newTodo = project.addTodo(description, dueDate);
+      this.refreshProjectDetails(projectId); // This line refreshes the project details, including the todo list
+      return newTodo;
+    } else {
+      throw new Error("Project not found");
+    }
+  }
+  removeTodo(projectId: string, todoId: string) {
+    const project = this.getProject(projectId);
+    if (project) {
+      project.removeTodo(todoId);
+      this.refreshProjectDetails(projectId);
+    }
+  }
+
+  updateTodo(projectId: string, todoId: string, description: string, dueDate: Date) {
+    const project = this.getProject(projectId);
+    if (project) {
+      project.updateTodo(todoId, description, dueDate);
+      this.refreshProjectDetails(projectId);
+    }
+  }
+
+  toggleTodo(projectId: string, todoId: string) {
+    const project = this.getProject(projectId);
+    if (project) {
+      project.toggleTodo(todoId);
+      this.refreshProjectDetails(projectId);
+    } else {
+      throw new Error("Project not found");
+    }
+  }
+
+  //Import/Export JSON
   exportToJSON(fileName: string = "projects") {
     const data = this.list.map(project => ({
       name: project.name,
@@ -149,7 +221,12 @@ export class ProjectsManager {
       userRole: project.userRole,
       finishDate: project.finishDate,
       progress: project.progress,
-      cost: project.cost
+      cost: project.cost,
+      todos: project.todos.map(todo => ({
+        description: todo.description,
+        dueDate: todo.dueDate,
+        completed: todo.completed
+      }))
     }));
     const json = JSON.stringify(data, null, 2);
     const blob = new Blob([json], { type: "application/json" });
@@ -171,17 +248,28 @@ export class ProjectsManager {
         const reader = new FileReader();
         reader.onload = (e) => {
           try {
-            const projects: IProject[] = JSON.parse(e.target?.result as string);
-            projects.forEach(project => {
+            const projects: ImportedProject[] = JSON.parse(e.target?.result as string);
+            
+            projects.forEach(projectData => {
               try {
-                this.newProject({
-                  ...project,
-                  finishDate: new Date(project.finishDate)
-                });
+                // Check if project already exists
+                const existingProject = this.list.find(p => p.name === projectData.name);
+
+                if (existingProject) {
+                  // Update existing project
+                  this.updateExistingProject(existingProject, projectData);
+                } else {
+                  // Create new project
+                  this.createNewProjectFromImport(projectData);
+                }
               } catch (error) {
-                console.error(`Failed to import project: ${project.name}`, error);
+                console.error(`Failed to import project: ${projectData.name}`, error);
               }
             });
+
+            // Refresh the UI after all imports are complete
+            this.refreshProjectsList();
+            
           } catch (error) {
             console.error("Failed to parse JSON", error);
             alert("Failed to import projects. Invalid file format.");
@@ -191,5 +279,75 @@ export class ProjectsManager {
       }
     });
     input.click();
+  }
+
+  private updateExistingProject(existingProject: Project, importedData: ImportedProject) {
+    // Confirm with user before updating
+    if (confirm(`Project "${importedData.name}" already exists. Would you like to update it with the imported data?`)) {
+      // Update basic project properties
+      existingProject.description = importedData.description;
+      existingProject.status = importedData.status;
+      existingProject.userRole = importedData.userRole;
+      existingProject.finishDate = new Date(importedData.finishDate);
+      existingProject.progress = importedData.progress;
+      existingProject.cost = importedData.cost;
+
+      // Handle todos
+      if (importedData.todos) {
+        // Clear existing todos if user confirms
+        if (existingProject.todos.length > 0) {
+          if (confirm(`Would you like to replace existing todos in project "${importedData.name}"?`)) {
+            existingProject.todos = []; // Clear existing todos
+          } else {
+            // Skip todo import if user doesn't want to replace
+            return;
+          }
+        }
+
+        // Import new todos
+        importedData.todos.forEach(todoData => {
+          const todo = existingProject.addTodo(
+            todoData.description,
+            new Date(todoData.dueDate)
+          );
+          if (todoData.completed) {
+            todo.toggle();
+          }
+        });
+      }
+
+      // Update UI
+      existingProject.setUI();
+      this.refreshProjectDetails(existingProject.id);
+    }
+  }
+
+  private createNewProjectFromImport(projectData: ImportedProject) {
+    const project = this.newProject({
+      name: projectData.name,
+      description: projectData.description,
+      status: projectData.status,
+      userRole: projectData.userRole,
+      finishDate: new Date(projectData.finishDate)
+    });
+
+    // Set additional properties
+    project.progress = projectData.progress;
+    project.cost = projectData.cost;
+
+    // Import todos if they exist
+    if (projectData.todos) {
+      projectData.todos.forEach(todoData => {
+        const todo = project.addTodo(
+          todoData.description,
+          new Date(todoData.dueDate)
+        );
+        if (todoData.completed) {
+          todo.toggle();
+        }
+      });
+    }
+
+    return project;
   }
 }

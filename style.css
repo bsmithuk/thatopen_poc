@@ -188,26 +188,26 @@ dialog::backdrop {
   backdrop-filter: blur(3px);
 }
 
-form {
+form, .form-container {
   width: 450px; 
   border-radius: 10px; 
   background-color: var(--background-100);
   color: white;
 }
 
-form h2 {
+form h2, .form-container h2 {
   padding: 20px; 
   border-bottom: 2px solid var(--background-200);
 }
 
-form .input-list {
+form .input-list, .form-container .input-list {
   display: flex; 
   flex-direction: column; 
   padding: 20px; 
   row-gap: 25px;
 }
 
-form .form-field-container {
+form .form-field-container, .form-container .form-field-container {
   display: flex;
   flex-direction: column;
 }
@@ -239,6 +239,45 @@ input:focus, textarea:focus, select:focus {
   font-size: var(--font-xs);
   color: rgba(150,150,150,1);
   margin-top: 5px;
+}
+
+/* Todo form specific styles */
+#add-todo-form {
+  width: 100%; /* Adjust width as needed */
+}
+
+#add-todo-form .form-field-container {
+  margin-bottom: 20px;
+}
+
+#add-todo-form input[type="date"] {
+  color: white;
+  background-color: var(--background-200);
+}
+
+#add-todo-form .button-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+#add-todo-form button {
+  width: auto;
+  min-width: 100px;
+}
+
+#add-todo-form button[type="submit"] {
+  background-color: var(--primary);
+}
+
+#add-todo-form button[type="button"] {
+  background-color: transparent;
+  border: 2px solid var(--primary-200);
+}
+
+#add-todo-form button[type="button"]:hover {
+  background-color: var(--primary-200);
 }
 
 /* Project details page */
@@ -275,6 +314,10 @@ input:focus, textarea:focus, select:focus {
   background-color: var(--background-200);
   border-radius: 10px;
   cursor: pointer;
+  word-break: break-word; 
+  overflow-wrap: break-word; 
+  white-space: normal; 
+  max-width: 100%; 
 }
 
 .todo-item:hover {
