@@ -1,11 +1,12 @@
 import { IProject, Project, ProjectStatus, UserRole } from "./Project";
-import { Todo } from "./ToDo";
+import { Todo, TodoStatus } from "./ToDo";
 
 interface ImportedProject extends IProject {
   todos?: {
     description: string;
     dueDate: string;
     completed: boolean;
+    status: TodoStatus;
   }[];
   progress: number;  
   cost: number;
@@ -98,15 +99,28 @@ export class ProjectsManager {
     const todoListElement = detailPage.querySelector('#todo-list');
     if (todoListElement) {
       todoListElement.innerHTML = project.todos.map(todo => `
-        <div class="todo-item">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="display: flex; column-gap: 15px; align-items: center;">
-              <span class="material-icons-round" style="padding: 10px; background-color: #686868; border-radius: 10px;">
+        <div class="todo-item" style="background-color: ${todo.getStatusColor()};">
+          <div class="todo-content">
+            <div class="todo-left">
+              <span class="material-icons-round todo-checkbox">
                 ${todo.completed ? 'check_circle' : 'radio_button_unchecked'}
               </span>
-              <p>${todo.description}</p>
+              <div class="todo-info">
+                <p class="todo-description">${todo.description}</p>
+                <span class="todo-status-badge">
+                  ${todo.status.replace('_', ' ').toUpperCase()}
+                </span>
+              </div>
             </div>
-            <p style="text-wrap: nowrap; margin-left: 10px;">${todo.dueDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+            <div class="todo-right">
+              <p class="todo-date">
+                ${todo.dueDate.toLocaleDateString('en-US', { 
+                  weekday: 'short', 
+                  month: 'short', 
+                  day: 'numeric' 
+                })}
+              </p>
+            </div>
           </div>
         </div>
       `).join('');
@@ -176,28 +190,29 @@ export class ProjectsManager {
   }
 
   //ToDo list functionality
-  addTodo(projectId: string, description: string, dueDate: Date) {
+  addTodo(projectId: string, description: string, dueDate: Date, status: TodoStatus = TodoStatus.TODO) {
     const project = this.getProject(projectId);
     if (project) {
-      const newTodo = project.addTodo(description, dueDate);
-      this.refreshProjectDetails(projectId); // This line refreshes the project details, including the todo list
+      const newTodo = project.addTodo(description, dueDate, status);
+      this.refreshProjectDetails(projectId);
       return newTodo;
     } else {
       throw new Error("Project not found");
     }
   }
-  removeTodo(projectId: string, todoId: string) {
+  
+  updateTodo(projectId: string, todoId: string, description: string, dueDate: Date, status: TodoStatus) {
     const project = this.getProject(projectId);
     if (project) {
-      project.removeTodo(todoId);
+      project.updateTodo(todoId, description, dueDate, status);
       this.refreshProjectDetails(projectId);
     }
   }
 
-  updateTodo(projectId: string, todoId: string, description: string, dueDate: Date) {
+  removeTodo(projectId: string, todoId: string) {
     const project = this.getProject(projectId);
     if (project) {
-      project.updateTodo(todoId, description, dueDate);
+      project.removeTodo(todoId);
       this.refreshProjectDetails(projectId);
     }
   }
@@ -225,7 +240,8 @@ export class ProjectsManager {
       todos: project.todos.map(todo => ({
         description: todo.description,
         dueDate: todo.dueDate,
-        completed: todo.completed
+        completed: todo.completed,
+        status: todo.status  
       }))
     }));
     const json = JSON.stringify(data, null, 2);
@@ -340,10 +356,11 @@ export class ProjectsManager {
       projectData.todos.forEach(todoData => {
         const todo = project.addTodo(
           todoData.description,
-          new Date(todoData.dueDate)
+          new Date(todoData.dueDate),
+          todoData.status || TodoStatus.TODO  // Add status with default
         );
         if (todoData.completed) {
-          todo.toggle();
+          todo.completed = true;  // Set completed directly instead of using toggle()
         }
       });
     }

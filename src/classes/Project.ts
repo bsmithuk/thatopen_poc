@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { Todo } from "./ToDo";
+import { Todo, TodoStatus } from "./ToDo";
 
 export type ProjectStatus = "pending" | "active" | "finished";
 export type UserRole = "architect" | "engineer" | "developer";
@@ -49,8 +49,8 @@ export class Project implements IProject {
     this.setUI();
   }
 
-  addTodo(description: string, dueDate: Date): Todo {
-    const newTodo = new Todo(description, dueDate);
+  addTodo(description: string, dueDate: Date, status: TodoStatus = TodoStatus.TODO): Todo {
+    const newTodo = new Todo(description, dueDate, status);
     this.todos.push(newTodo);
     return newTodo;
   }
@@ -59,10 +59,10 @@ export class Project implements IProject {
     this.todos = this.todos.filter(todo => todo.id !== id);
   }
 
-  updateTodo(id: string, description: string, dueDate: Date) {
+  updateTodo(id: string, description: string, dueDate: Date, status: TodoStatus) {
     const todo = this.todos.find(t => t.id === id);
     if (todo) {
-      todo.update(description, dueDate);
+        todo.update(description, dueDate, status);
     }
   }
 
@@ -121,15 +121,22 @@ export class Project implements IProject {
     const todoList = this.ui.querySelector('#todo-list');
     if (todoList) {
       todoList.innerHTML = this.todos.map(todo => `
-        <div class="todo-item">
+        <div class="todo-item" style="background-color: ${todo.getStatusColor()};">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; column-gap: 15px; align-items: center;">
-              <span class="material-icons-round" style="padding: 10px; background-color: #686868; border-radius: 10px;">
+              <span class="material-icons-round" style="padding: 10px; background-color: rgba(104, 104, 104, 0.3); border-radius: 10px;">
                 ${todo.completed ? 'check_circle' : 'radio_button_unchecked'}
               </span>
-              <p>${todo.description}</p>
+              <div>
+                <p>${todo.description}</p>
+                <p style="font-size: var(--font-xs); color: rgba(255,255,255,0.6); margin-top: 4px;">
+                  ${todo.status.replace('_', ' ').toUpperCase()}
+                </p>
+              </div>
             </div>
-            <p style="text-wrap: nowrap; margin-left: 10px;">${todo.dueDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+            <p style="text-wrap: nowrap; margin-left: 10px;">
+              ${todo.dueDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+            </p>
           </div>
         </div>
       `).join('');

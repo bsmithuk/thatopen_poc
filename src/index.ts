@@ -1,7 +1,7 @@
 import { IProject, Project, ProjectStatus, UserRole } from "./classes/Project";
 import { ProjectsManager } from "./classes/ProjectsManager";
 import { PageNavigator } from "./classes/PageNavigator";
-import { Todo } from "./classes/ToDo";
+import { Todo, TodoStatus } from "./classes/ToDo";
 
 const projectsListUI = document.getElementById("projects-list") as HTMLElement;
 const projectsManager = new ProjectsManager(projectsListUI);
@@ -120,16 +120,16 @@ if (addTodoBtn && addTodoModal && addTodoForm) {
     const formData = new FormData(addTodoForm);
     const description = formData.get("description") as string;
     const dueDate = new Date(formData.get("dueDate") as string);
+    const status = formData.get("status") as TodoStatus;
     
     const currentProjectId = document.getElementById("project-details")?.getAttribute("data-current-project-id");
     
     if (currentProjectId) {
       try {
-        projectsManager.addTodo(currentProjectId, description, dueDate);
+        projectsManager.addTodo(currentProjectId, description, dueDate, status);
         addTodoForm.reset();
         addTodoModal.close();
         
-        // Refresh the project details to show the new todo
         projectsManager.refreshProjectDetails(currentProjectId);
       } catch (err) {
         console.error("Failed to add Todo:", err);
