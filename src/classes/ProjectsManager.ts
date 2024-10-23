@@ -22,13 +22,14 @@ export class ProjectsManager {
   }
 
   private initializeDefaultProject() {
-    this.newProject({
+    const project = this.newProject({
       name: "Default Project",
       description: "This is just a default app project",
       status: "pending",
       userRole: "architect",
       finishDate: new Date(),
     });
+    project.ui.click()
   }
 
   newProject(data: IProject): Project {
